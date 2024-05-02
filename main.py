@@ -1,14 +1,34 @@
 import random
 import math
 
-def obtener_datos(nombre_archivo):
-    with open(nombre_archivo, 'r') as file:
-        datos = []
-        for i in file.readlines():
-            i = i.strip()
-            i = float(i)
-            datos.append(i)
-    return datos
+
+class Dynamics:
+    def __init__(self, file_name: str):
+        self._obtener_datos(file_name)
+
+    @staticmethod
+    def _obtener_datos(nombre_archivo):
+
+        with open(nombre_archivo + '.csv', 'rt', encoding='UTF8') as file:
+            datos = file.readlines()
+            for i in range(len(datos)):
+                datos[i] = datos[i].strip()
+                datos[i] = datos[i].split(';')
+                if i == 0:
+                    for j in range(len(datos[i])):
+                        datos[i][j] = datos[i][j].strip()
+                else:
+                    for j in range(len(datos[i])):
+                        datos[i][j] = datos[i][j].replace(',', '.')
+                        if not datos[i][j]:
+                            datos[i][j] = '-'
+                datos[i] = ','.join(datos[i])
+
+        with open(nombre_archivo + '_procesado.csv', 'wt', encoding='UTF8') as file:
+            for linea in datos:
+
+                file.write(linea + '\n')
+
 
 def desviacion_estandar(data_list):
     var = 0
@@ -34,16 +54,7 @@ def calcular_desv_para(data_list, n):
     
     return desviacion_estandar(var)
 
+
 if __name__ == '__main__':
 
-    '''
-    datos = obtener_datos('toma_muestras.txt')
-    
-    print(f'Para n = 2:\n{calcular_desv_para(datos, 2)}\n------------------------')
-    print(f'Para n = 2:\n{calcular_desv_para(datos, 4)}\n------------------------')
-    print(f'Para n = 2:\n{calcular_desv_para(datos, 6)}\n------------------------')
-    '''
-
-    datos = obtener_datos('muestra_arroces.txt')
-    
-    print(desviacion_estandar(datos))
+    texto = Dynamics('Lab2\datos_bajada')

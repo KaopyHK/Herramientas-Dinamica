@@ -6,8 +6,7 @@ class Dynamics:
     def __init__(self, file_name: str):
         self._obtener_datos(file_name)
 
-    @staticmethod
-    def _obtener_datos(nombre_archivo):
+    def _obtener_datos(self, nombre_archivo):
 
         with open(nombre_archivo + '.csv', 'rt', encoding='UTF8') as file:
             datos = file.readlines()
@@ -22,39 +21,56 @@ class Dynamics:
                         datos[i][j] = datos[i][j].replace(',', '.')
                         if not datos[i][j]:
                             datos[i][j] = '-'
-                datos[i] = ','.join(datos[i])
+                # datos[i] = ','.join(datos[i])
+        # self._escribir_datos(datos)
+        vel_text, frz_text = self._propio_lab2(datos)
+        self._escribir_datos('Lab2\Velocidad', vel_text)
+        self._escribir_datos('Lab2\Fuerza', frz_text)
 
+    @staticmethod
+    def _escribir_datos(nombre_archivo, datos):
         with open(nombre_archivo + '_procesado.csv', 'wt', encoding='UTF8') as file:
             for linea in datos:
 
                 file.write(linea + '\n')
 
+    @staticmethod
+    def _propio_lab2(datos):
 
-def desviacion_estandar(data_list):
-    var = 0
-    for i in data_list:
-        var += float(i)
-    promedio = var/len(data_list)
+        fuerza_index, velocidad_index = (0, 0)
+        for i in range(len(datos[0])):
+            if fuerza_index and velocidad_index:
+                break
+            if '(N)' in datos[0][i]:
+                fuerza_index = i
+            elif '(m/s)' in datos[0][i]:
+                velocidad_index = i
 
-    var = 0
-    for i in data_list:
-        var += (promedio - float(i)) ** 2
-    var = var/(len(data_list) - 1)
+        fuerza_texto = []
+        velocidad_texto = []
+        for linea in datos:
+            var = [linea[0]]
+            for i in range(fuerza_index, len(linea) + 1, 8):
+                var.append(linea[i])
+            fuerza_texto.append(var)
 
-    desviacion_estandar = round(math.sqrt(var), 4)
+        for linea in datos:
+            var = [linea[0]]
+            for i in range(velocidad_index, len(linea) + 1, 8):
+                var.append(linea[i])
+            velocidad_texto.append(var)
 
-    error_estandar = round(desviacion_estandar/(math.sqrt(len(data_list) - 1)), 4)
+        for i in range(len(velocidad_texto)):
+            velocidad_texto[i] = ','.join(velocidad_texto[i])
 
-    return f'La desviacion estandar es: {desviacion_estandar}\nEl error estandar es: {error_estandar}'
+        for i in range(len(fuerza_texto)):
+            fuerza_texto[i] = ','.join(fuerza_texto[i])
 
-def calcular_desv_para(data_list, n):
-    var = []
-    for i in range(n):
-        var.append(data_list[random.randint(0, len(datos) - 1)])
-    
-    return desviacion_estandar(var)
+        return velocidad_texto, fuerza_texto
+
+
 
 
 if __name__ == '__main__':
 
-    texto = Dynamics('Lab2\datos_bajada')
+    texto = Dynamics('Lab2\datos_subida')
